@@ -1,6 +1,9 @@
 # home-assistant_OctopusAgile
 Octopus Agile custom component for Home Assistant
 
+## Referral code
+Feel free to use my referral code and get £50 credit to your account (as well as mine): https://share.octopus.energy/lilac-bison-793
+
 ## Installation
 Clone this repo into <homeassistant config>/custom_components
 
