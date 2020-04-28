@@ -270,29 +270,36 @@ def setup(hass, config):
         nexttime = roundedtime + timedelta(minutes=30)
         hass.states.set("octopusagile.half_hour_timer_nextupdate", nexttime.strftime("%Y-%m-%dT%H:%M:%SZ"))
         
-        if first_run is False:
-            hass.states.set("octopusagile.half_hour_timer_lastupdate", nowtime.strftime("%Y-%m-%dT%H:%M:%SZ"))
-            handle_half_hour_timer(None)
+        try:
+            if first_run is False:
+                handle_half_hour_timer(None)
+                hass.states.set("octopusagile.half_hour_timer_lastupdate", nowtime.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        except Exception as e:
+            _LOGGER.error(e)
 
         # Setup timer to run again in 30
         track_point_in_time(hass, half_hour_timer, nexttime)
 
     def update_timers(nowtime):
         nexttime = nowtime
-        nexttime = nexttime.replace(hour=18, minute = 00, second = 00)
+        nexttime = nexttime.replace(hour=19, minute = 00, second = 00)
         # _LOGGER.warning(nexttime)
         if nexttime <= nowtime:
             nexttime = nexttime + timedelta(days=1)
             # _LOGGER.warning("Runtime has past, scheduling for tomorrow")
         # _LOGGER.warning(nexttime)
 
+        try:
+            if first_run is False:
+                # _LOGGER.warning("Calling handle update timers")
+                handle_update_timers(None)
+                hass.states.set("octopusagile.update_timers_lastupdate", nowtime.strftime("%Y-%m-%dT%H:%M:%SZ"))
+
+        except Exception as e:
+            _LOGGER.error(e)
+            nexttime = nowtime + timedelta(minutes=30)
+
         hass.states.set("octopusagile.update_timers_nextupdate", nexttime.strftime("%Y-%m-%dT%H:%M:%SZ"))
-
-        if first_run is False:
-            # _LOGGER.warning("Calling handle update timers")
-            hass.states.set("octopusagile.update_timers_lastupdate", nowtime.strftime("%Y-%m-%dT%H:%M:%SZ"))
-            handle_update_timers(None)
-
         track_point_in_time(hass, update_timers, nexttime)
 
 

@@ -58,7 +58,7 @@ class PreviousRate(Entity):
         # attributes['sn'] = 'some other data'
         # # attributes['date_to']
         # self._attributes = attributes
-        rate = self.myrates.get_previous_rate()
+        rate = round(self.myrates.get_previous_rate(), 2)
         self._state = rate
 
 class CurrentRate(Entity):
@@ -105,7 +105,7 @@ class CurrentRate(Entity):
         # attributes['sn'] = 'some other data'
         # # attributes['date_to']
         # self._attributes = attributes
-        rate = self.myrates.get_current_rate()
+        rate = round(self.myrates.get_current_rate(), 2)
         self._state = rate
 
 class NextRate(Entity):
@@ -152,5 +152,5 @@ class NextRate(Entity):
         # attributes['sn'] = 'some other data'
         # # attributes['date_to']
         # self._attributes = attributes
-        rate = self.myrates.get_next_rate()
+        rate = round(self.myrates.get_next_rate(), 2)
         self._state = rate
