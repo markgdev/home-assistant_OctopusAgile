@@ -1,0 +1,3 @@
+[submodule "OctopusAgile"]
+	path = OctopusAgile
+	url = git@github.com:markgdev/OctopusAgile.git
