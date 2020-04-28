@@ -117,3 +117,14 @@ When the update timers timer last run
 
 ### octopusagile.<run_device_name>
 A seperate entity for each configured run_device with the time stored in state and start time, start in, end in and average rate stored in the attributes
+
+## Example usage
+### Dashboard
+![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/dashboard.png)
+
+### Dishwasher
+![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/dishwasher.png)
+
+### Rates
+![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/rates.png)
+
