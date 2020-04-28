@@ -1,3 +1,3 @@
-"""Constants for the mark integration."""
+"""Constants for the OctopusAgile integration."""
 
 DOMAIN = "octopusagile"

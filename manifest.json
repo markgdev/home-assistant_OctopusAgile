@@ -1,6 +1,6 @@
 {
   "domain": "octopusagile",
-  "name": "mark",
+  "name": "octopusagile",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/OctopusAgile",
   "requirements": [
@@ -11,6 +11,6 @@
   "homekit": {},
   "dependencies": [],
   "codeowners": [
-    "@megardner"
+    "@markgdev"
   ]
 }
