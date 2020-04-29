@@ -123,6 +123,7 @@ A seperate entity for each configured run_device with the time stored in state a
 
 ## Example usage
 ### Dashboard
+Note that i am using an owl energy monitor for the energy usage stats. I will look at pulling these stats direct from octopus once my agile account is setup
 ![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/dashboard.png)
 
 ### Dishwasher
