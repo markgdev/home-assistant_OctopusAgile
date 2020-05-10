@@ -1,6 +1,9 @@
 # home-assistant_OctopusAgile rates card
 Octopus Agile custom card to display future rates in Home Assistant
 
+## Referral code
+Feel free to use my referral code and get £50 credit to your account (as well as mine): https://share.octopus.energy/lilac-bison-793
+
 ## Installation
 1. Download [agile-rates-card.js](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/custom_cards/agile-rates-card.js)
 2. Place file in config/www directory. - Create this directory and restart home assistant if this doesn't exist.
