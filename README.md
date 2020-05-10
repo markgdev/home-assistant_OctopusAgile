@@ -1,6 +1,9 @@
 # home-assistant_OctopusAgile
 Octopus Agile custom component for Home Assistant
 
+## Referral code
+Feel free to use my referral code and get £50 credit to your account (as well as mine): https://share.octopus.energy/lilac-bison-793
+
 ## Installation
 Clone this repo into <homeassistant config>/custom_components
 
@@ -117,3 +120,15 @@ When the update timers timer last run
 
 ### octopusagile.<run_device_name>
 A seperate entity for each configured run_device with the time stored in state and start time, start in, end in and average rate stored in the attributes
+
+## Example usage
+### Dashboard
+Note that i am using an owl energy monitor for the energy usage stats. I will look at pulling these stats direct from octopus once my agile account is setup
+![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/dashboard.png)
+
+### Dishwasher
+![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/dishwasher.png)
+
+### Rates
+![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/rates.png)
+
