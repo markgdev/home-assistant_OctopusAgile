@@ -132,3 +132,6 @@ Note that i am using an owl energy monitor for the energy usage stats. I will lo
 ### Rates
 ![Image of Dashboard](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/images/rates.png)
 
+### Rates card
+[See here](https://github.com/markgdev/home-assistant_OctopusAgile/tree/master/custom_cards)
+![Image of Card](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/custom_cards/agile-rates-card-screenshot.png)
