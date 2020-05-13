@@ -136,6 +136,8 @@ def setup(hass, config):
             moneymaker = next(iter(moneymaker_dict.items()))
             entity_id = moneymaker[0]
             params = moneymaker[1]
+            if params is not None:
+                params = params["params"]
             entity_free_rates = {}
             for time, rate in free_rates.items():
                 entity_free_rates[time] = {"params": params, "rate": rate}
@@ -199,7 +201,7 @@ def setup(hass, config):
                 if entity_id.startswith("climate"):
                     if times[rounded_time_str]["params"] is not None:
                         params = times[rounded_time_str]["params"]
-                        temp = params[0]["temp"]
+                        temp = params["temp"]
                         _LOGGER.warning(temp)
                         hass.services.call("climate", "set_temperature", {'entity_id': entity_id, "temperature": temp})
                     else:
