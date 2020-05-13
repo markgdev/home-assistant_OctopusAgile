@@ -55,8 +55,13 @@ def setup(hass, config):
         _LOGGER.error("region_code must be set for OctopusAgile")
     else:
         region_code = config["OctopusAgile"]["region_code"]
-        myrates = Agile(region_code)
+        auth = config["OctopusAgile"]["auth"]
+        mpan = config["OctopusAgile"]["mpan"]
+        serial = config["OctopusAgile"]["serial"]
+        myrates = Agile(area_code=region_code, auth=auth, mpan=mpan, serial=serial)
         hass.states.set(f"octopusagile.region_code", region_code)
+        startdate = config["OctopusAgile"]["startdate"]
+        hass.states.set(f"octopusagile.startdate", startdate)
 
     # Populate timers on restart
     try:
@@ -224,6 +229,60 @@ def setup(hass, config):
         f.write(jsonstr)
         f.close()
 
+    def handle_update_consumption(call):
+                # self.useurl = kwargs.get('use')
+        # self.costurl = kwargs.get('cost')
+        startdate = hass.states.get("octopusagile.startdate").state
+        startdate = date.fromisoformat(
+            str(startdate))
+        gas = False #kwargs.get('gas', False)
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        startyear = date(today.year, 1, 1)
+        startmonth = date(today.year, today.month, 1)
+
+        if today == startmonth:
+            if today.month == 1:
+                startmonth = date(today.year-1, 12, 1)
+            else:
+                startmonth = date(today.year, today.month-1, 1)
+        if today == startyear:
+            startyear = date(today.year-1, 1, 1)
+
+        if startdate > startmonth:
+            startmonth = startdate
+
+        if startdate > startyear:
+            startyear = startdate
+
+        monthlyusage, monthlycost = myrates.calculcate_cost(
+            start=startmonth, end=today)
+        # self.log('Total monthly usage: {}'.format(monthlyusage), level='INFO')
+        # self.log('Total monthly cost: {} p'.format(monthlycost), level='INFO')
+
+        yearlyusage, yearlycost = myrates.calculcate_cost(
+            start=startyear, end=today)
+        # self.log('Total yearly usage: {}'.format(yearlyusage), level='INFO')
+        # self.log('Total yearly cost: {} p'.format(yearlycost), level='INFO')
+
+        if not gas:
+            hass.states.set('octopusagile.yearly_usage',
+                           round(yearlyusage, 2),
+                           attributes={'unit_of_measurement': 'kWh',
+                                       'icon': 'mdi:flash'})
+            hass.states.set('octopusagile.yearly_cost',
+                           round(yearlycost/100, 2),
+                           attributes={'unit_of_measurement': '£',
+                                       'icon': 'mdi:cash'})
+            hass.states.set('octopusagile.monthly_usage',
+                           round(monthlyusage, 2),
+                           attributes={'unit_of_measurement': 'kWh',
+                                       'icon': 'mdi:flash'})
+            hass.states.set('octopusagile.monthly_cost',
+                           round(monthlycost/100, 2),
+                           attributes={'unit_of_measurement': '£',
+                                       'icon': 'mdi:cash'})
+
     def half_hour_timer(nowtime):
         roundedtime = myrates.round_time(nowtime)
         nexttime = roundedtime + timedelta(minutes=30)
@@ -257,11 +316,33 @@ def setup(hass, config):
         hass.states.set("octopusagile.update_timers_nextupdate", nexttime.strftime("%Y-%m-%dT%H:%M:%SZ"))
         track_point_in_time(hass, update_timers, nexttime)
 
+    def update_consumption(nowtime):
+        # nexttime = nowtime
+        # nexttime = nexttime.replace(hour=19, minute = 00, second = 00)
+        roundedtime = myrates.round_time(nowtime)
+        nexttime = roundedtime + timedelta(minutes=30)
+        # if nexttime <= nowtime:
+        #     nexttime = nexttime + timedelta(days=1)
+
+        try:
+            if first_run is False:
+                handle_update_consumption(None)
+                hass.states.set("octopusagile.update_consumption_lastupdate", nowtime.strftime("%Y-%m-%dT%H:%M:%SZ"))
+
+        except Exception as e:
+            _LOGGER.error(e)
+            nexttime = nowtime + timedelta(minutes=30)
+
+        hass.states.set("octopusagile.update_consumption_nextupdate", nexttime.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        track_point_in_time(hass, update_consumption, nexttime)
+
 
     hass.services.register(DOMAIN, "update_timers", handle_update_timers)
     hass.services.register(DOMAIN, "half_hour", handle_half_hour_timer)
+    hass.services.register(DOMAIN, "update_consumption", handle_update_consumption)
     update_timers(dt_util.utcnow())
     half_hour_timer(dt_util.utcnow())
+    update_consumption(dt_util.utcnow())
     first_run = False
 
     # Return boolean to indicate that initialization was successfully.
