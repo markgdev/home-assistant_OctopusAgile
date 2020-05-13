@@ -85,17 +85,18 @@ class AgileRatesCard extends HTMLElement {
         var x = 1;
         const mediumlimit = this.mediumlimit;
         const highlimit = this.highlimit;
+        const unitstr = this.unitstr;
         
         Object.keys(attributes).forEach(function (key) {
             const date_milli = Date.parse(key);
             var date = new Date(date_milli);
             const lang = navigator.language || navigator.languages[0];
-            var options = { hour12: false };
+            var options = { hour12: false, hour: '2-digit', minute:'2-digit'};
             var time_locale = date.toLocaleTimeString(lang, options);
             var colour = "green";
             if(attributes[key] > highlimit) colour = "red";
             else if(attributes[key] > mediumlimit) colour = "orange";
-            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key] + "p/kWh</td></tr>");
+            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key] + unitstr + "</td></tr>");
             if (x % rows_per_col == 0) {
                 tables = tables.concat(table);
                 table = "";
@@ -162,6 +163,14 @@ class AgileRatesCard extends HTMLElement {
         }
         else {
             this.highlimit = config.highlimit;
+        }
+
+        if(!config.showunits) {
+            this.unitstr = "p/kWh";
+        }
+        else {
+            if(config.showunits == "true") this.unitstr = "p/kWh";
+            else this.unitstr = "";
         }
     }
 
