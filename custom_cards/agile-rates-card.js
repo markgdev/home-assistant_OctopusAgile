@@ -67,6 +67,10 @@ class AgileRatesCard extends HTMLElement {
                 border: 2px solid MediumSeaGreen;
                 background-color: MediumSeaGreen;
             }
+            td.blue {
+                border: 2px solid #391CD9;
+                background-color: #391CD9;
+            }
             `;
             card.appendChild(style);
             card.appendChild(this.content);
@@ -96,7 +100,8 @@ class AgileRatesCard extends HTMLElement {
             var colour = "green";
             if(attributes[key] > highlimit) colour = "red";
             else if(attributes[key] > mediumlimit) colour = "orange";
-            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key] + unitstr + "</td></tr>");
+            else if(attributes[key] <= 0 ) colour = "blue";
+            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key].toFixed(2) + unitstr + "</td></tr>");
             if (x % rows_per_col == 0) {
                 tables = tables.concat(table);
                 table = "";
