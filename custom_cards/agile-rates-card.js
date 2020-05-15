@@ -101,7 +101,7 @@ class AgileRatesCard extends HTMLElement {
             if(attributes[key] > highlimit) colour = "red";
             else if(attributes[key] > mediumlimit) colour = "orange";
             else if(attributes[key] <= 0 ) colour = "blue";
-            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key] + unitstr + "</td></tr>");
+            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key].toFixed(2) + unitstr + "</td></tr>");
             if (x % rows_per_col == 0) {
                 tables = tables.concat(table);
                 table = "";
