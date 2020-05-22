@@ -46,6 +46,9 @@ class AgileRatesCard extends HTMLElement {
             td.time_green{
                 border-bottom: 1px solid MediumSeaGreen;
             }
+            td.time_blue{
+                border-bottom: 1px solid #391CD9;
+            }
             td.rate {
                 color:white;
                 text-align:center;
