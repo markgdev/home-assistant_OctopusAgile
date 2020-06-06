@@ -58,7 +58,7 @@ OctopusAgile:
     day_to: tomorrow
     entity_id: switch.water_heater
     numHrs: 5
-    paramms: null
+    params: null
     requirements:
       - day_from: today
         day_to: tomorrow
