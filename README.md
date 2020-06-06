@@ -48,6 +48,10 @@ Create a sensor for each of: current rate, previous rate and next rate
 
 OctopusAgile:
   region_code: "L"
+  mpan: 00000000
+  serial: 00000000
+  auth: abc00000000
+  startdate: "2020-05-08"
   moneymakers:
   - switch.water_heater: null
   - climate.downstairs: 
