@@ -185,7 +185,7 @@ def setup(hass, config):
             best_time = myrates.get_min_time_run(energy_time, rates)
             start_time = next(iter(best_time))
             start_time_obj = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
-            rate = best_time[start_time]
+            rate = round(best_time[start_time], 2)
             start_in = (start_time_obj - rounded_time).total_seconds()/3600
             end_in = start_in + run_time
             attribs = {"start_time": start_time, "start_in": start_in, "end_in": end_in, "rate": rate}
