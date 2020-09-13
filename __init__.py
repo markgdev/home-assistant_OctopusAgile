@@ -111,7 +111,7 @@ def setup(hass, config):
             parsed_requirements = []
             for requirement in requirements:
                 parsed_requirement = {}
-                parsed_requirement["slots"] = requirement["numHrs"]*2
+                parsed_requirement["slots"] = int(requirement["numHrs"]*2)
                 if requirement["day_from"] == "today":
                     parsed_requirement["time_from"] = today.strftime(f"%Y-%m-%dT{ requirement['time_from'] }Z")
                 elif requirement["day_from"] == "tomorrow":
@@ -125,7 +125,7 @@ def setup(hass, config):
             
             rates = myrates.get_rates(parsed_date_from, parsed_date_to)
             date_rates = rates["date_rates"]
-            required_slots = numHrs*2
+            required_slots = int(numHrs*2)
             min_rates = myrates.get_min_times(required_slots, date_rates, parsed_requirements)
             entity_min_rates = {}
             for time, rate in min_rates.items():
