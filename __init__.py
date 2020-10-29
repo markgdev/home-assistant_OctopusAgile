@@ -212,12 +212,18 @@ def setup(hass, config):
                     else:
                         _LOGGER.error(f"{entity_id} does not have any params set, don't know what to do")
                 else:
-                    hass.services.call('switch', 'turn_on', {'entity_id': entity_id})
+                    if entity_id.startswith("input_boolean"):
+                        hass.services.call('input_boolean', 'turn_on', {'entity_id': entity_id})
+                    else:
+                        hass.services.call('switch', 'turn_on', {'entity_id': entity_id})
             else:
                 if entity_id.startswith("climate"):
                     hass.services.call("climate", "set_hvac_mode", {'entity_id': entity_id, "hvac_mode": "auto"})
                 else:
-                    hass.services.call('switch', 'turn_off', {'entity_id': entity_id})
+                    if entity_id.startswith("input_boolean"):
+                        hass.services.call('input_boolean', 'turn_off', {'entity_id': entity_id})
+                    else:
+                        hass.services.call('switch', 'turn_off', {'entity_id': entity_id})
 
         try:
             with open(datatorefile) as f:
