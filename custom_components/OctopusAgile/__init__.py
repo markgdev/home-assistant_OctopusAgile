@@ -1,4 +1,4 @@
-"""The OctopusAgile integration."""
+"""The octopusagile integration."""
 # Example service data:
 # timers:
 #   - entity_id: "switch.tasmota"
@@ -51,16 +51,16 @@ def setup(hass, config):
     first_run = True
     """Set up is called when Home Assistant is loading our component."""
     datatorefile = hass.config.path(f"{DOMAIN}.json")
-    if "region_code" not in config["OctopusAgile"]:
-        _LOGGER.error("region_code must be set for OctopusAgile")
+    if "region_code" not in config["octopusagile"]:
+        _LOGGER.error("region_code must be set for octopusagile")
     else:
-        region_code = config["OctopusAgile"]["region_code"]
-        auth = config["OctopusAgile"]["auth"]
-        mpan = config["OctopusAgile"]["mpan"]
-        serial = config["OctopusAgile"]["serial"]
+        region_code = config["octopusagile"]["region_code"]
+        auth = config["octopusagile"]["auth"]
+        mpan = config["octopusagile"]["mpan"]
+        serial = config["octopusagile"]["serial"]
         myrates = Agile(area_code=region_code, auth=auth, mpan=mpan, serial=serial)
         hass.states.set(f"octopusagile.region_code", region_code)
-        startdate = config["OctopusAgile"]["startdate"]
+        startdate = config["octopusagile"]["startdate"]
         hass.states.set(f"octopusagile.startdate", startdate)
 
     # Populate timers on restart
@@ -78,7 +78,7 @@ def setup(hass, config):
     def handle_update_timers(call):
         """Handle the service call."""
         timer_list = []
-        timers = config["OctopusAgile"]["timers"]
+        timers = config["octopusagile"]["timers"]
         for timer in timers:
             entity_id = timer["entity_id"]
             numHrs = timer["numHrs"]
@@ -135,7 +135,7 @@ def setup(hass, config):
 
         # Add any free slots to the timer for each moneymaker device
         new_rates = myrates.get_new_rates()["date_rates"]
-        moneymakers = config["OctopusAgile"]["moneymakers"]
+        moneymakers = config["octopusagile"]["moneymakers"]
         free_rates = myrates.get_times_below(new_rates, 0)
         for moneymaker_dict in moneymakers:
             moneymaker = next(iter(moneymaker_dict.items()))
@@ -171,7 +171,7 @@ def setup(hass, config):
         hass.states.set("octopusagile.rates", "", new_rates)
 
         # Get next best time to run devices
-        devices = config["OctopusAgile"]["run_devices"]
+        devices = config["octopusagile"]["run_devices"]
         device_times = {}
         for device in devices:
             run_before = device["run_before"]
