@@ -5,9 +5,9 @@ Octopus Agile custom component for Home Assistant
 Feel free to use my referral code and get £50 credit to your account (as well as mine): https://share.octopus.energy/lilac-bison-793
 
 ## Installation
-Clone this repo into <homeassistant config>/custom_components
+Clone this repo
 
-Rename home-assistant_OctopusAgile to OctopusAgile, Home assistant doesn't seem to like the directory name not matching the component name.
+Copy custom_components/OctopusAgile to <homeassistant config>/custom_components/OctopusAgile
 
 ## Configuration
 Example configuration.yaml config as below.
