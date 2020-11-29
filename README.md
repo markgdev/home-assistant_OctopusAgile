@@ -46,7 +46,7 @@ Create a sensor for each of: current rate, previous rate and next rate
 
 ```yaml
 
-OctopusAgile:
+octopusagile:
   region_code: "L"
   mpan: 00000000
   serial: 00000000
@@ -96,7 +96,7 @@ OctopusAgile:
     run_time: 2.5
 
 sensor:
-- platform: "OctopusAgile"
+- platform: "octopusagile"
 
 ```
 
