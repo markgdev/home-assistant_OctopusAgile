@@ -1,6 +1,6 @@
 {
-  "domain": "octopusagile",
-  "name": "octopusagile",
+  "domain": "OctopusAgile",
+  "name": "OctopusAgile",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/OctopusAgile",
   "requirements": [
