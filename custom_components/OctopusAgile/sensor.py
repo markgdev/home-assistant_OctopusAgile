@@ -1,6 +1,9 @@
 """Platform for sensor integration."""
 from homeassistant.const import TEMP_CELSIUS
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.event import track_point_in_time
+import homeassistant.util.dt as dt_util
+from datetime import timedelta
 from .OctopusAgile.Agile import Agile
 import logging
 _LOGGER = logging.getLogger(__name__)
@@ -14,11 +17,14 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     add_entities([CurrentRate(hass)])
     add_entities([NextRate(hass)])
 
+
 class PreviousRate(Entity):
     """Representation of a Sensor."""
 
     def __init__(self, hass):
         """Initialize the sensor."""
+        self.hass = hass
+        self.entity_id = "sensor.octopus_agile_previous_rate"
         self._state = None
         # self._hass = hass
         self._attributes = {}
@@ -27,6 +33,9 @@ class PreviousRate(Entity):
         # else:
         region_code = hass.states.get("octopusagile.region_code").state
         self.myrates = Agile(region_code)
+
+        self.timer(dt_util.utcnow())
+
 
     @property
     def name(self):
@@ -47,6 +56,20 @@ class PreviousRate(Entity):
     def device_state_attributes(self):
         """Return the state attributes of the sensor."""
         return self._attributes
+
+    @property    
+    def should_poll(self):
+        """Return if polling is required."""
+        # Disable polling as we're going to update 
+        # with the octopusagile.half_hour service
+        return False
+
+    def timer(self, nowtime):
+        roundedtime = self.myrates.round_time(nowtime)
+        nexttime = roundedtime + timedelta(minutes=30)
+        self.schedule_update_ha_state(True)
+        # Setup timer to run again in 30
+        track_point_in_time(self.hass, self.timer, nexttime)
 
     def update(self):
         """Fetch new state data for the sensor.
@@ -69,11 +92,14 @@ class CurrentRate(Entity):
         self._state = None
         # self._hass = hass
         self._attributes = {}
+        self.hass = hass
+        self.entity_id = "sensor.octopus_agile_current_rate"
         # if "region_code" not in self.config["OctopusAgile"]:
         #     _LOGGER.error("region_code must be set for OctopusAgile")
         # else:
         region_code = hass.states.get("octopusagile.region_code").state
         self.myrates = Agile(region_code)
+        self.timer(dt_util.utcnow())
 
     @property
     def name(self):
@@ -94,6 +120,20 @@ class CurrentRate(Entity):
     def device_state_attributes(self):
         """Return the state attributes of the sensor."""
         return self._attributes
+
+    @property    
+    def should_poll(self):
+        """Return if polling is required."""
+        # Disable polling as we're going to update 
+        # with the octopusagile.half_hour service
+        return False
+
+    def timer(self, nowtime):
+        roundedtime = self.myrates.round_time(nowtime)
+        nexttime = roundedtime + timedelta(minutes=30)
+        self.schedule_update_ha_state(True)
+        # Setup timer to run again in 30
+        track_point_in_time(self.hass, self.timer, nexttime)
 
     def update(self):
         """Fetch new state data for the sensor.
@@ -116,11 +156,14 @@ class NextRate(Entity):
         self._state = None
         # self._hass = hass
         self._attributes = {}
+        self.hass = hass
+        self.entity_id = "sensor.octopus_agile_next_rate"
         # if "region_code" not in self.config["OctopusAgile"]:
         #     _LOGGER.error("region_code must be set for OctopusAgile")
         # else:
         region_code = hass.states.get("octopusagile.region_code").state
         self.myrates = Agile(region_code)
+        self.timer(dt_util.utcnow())
 
     @property
     def name(self):
@@ -141,6 +184,20 @@ class NextRate(Entity):
     def device_state_attributes(self):
         """Return the state attributes of the sensor."""
         return self._attributes
+
+    @property    
+    def should_poll(self):
+        """Return if polling is required."""
+        # Disable polling as we're going to update 
+        # with the octopusagile.half_hour service
+        return False
+
+    def timer(self, nowtime):
+        roundedtime = self.myrates.round_time(nowtime)
+        nexttime = roundedtime + timedelta(minutes=30)
+        self.schedule_update_ha_state(True)
+        # Setup timer to run again in 30
+        track_point_in_time(self.hass, self.timer, nexttime)
 
     def update(self):
         """Fetch new state data for the sensor.
