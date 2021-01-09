@@ -1,0 +1,8 @@
+update_consumption:
+  description: Get the most recent consumption data from the Octopus API
+
+update_timers:
+  description: Manually populate timers and moneymakers.
+
+half_hour:
+  description: Update rates entity, switch entities on/off based on the timers entity.
