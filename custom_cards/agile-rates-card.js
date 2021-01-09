@@ -2,7 +2,7 @@ class AgileRatesCard extends HTMLElement {
     set hass(hass) {
         if (!this.content) {
             const card = document.createElement('ha-card');
-            card.header = 'Agile Rates';
+            card.header = this.title;
             this.content = document.createElement('div');
             this.content.style.padding = '0 16px 16px';
 
@@ -93,7 +93,6 @@ class AgileRatesCard extends HTMLElement {
         const mediumlimit = this.mediumlimit;
         const highlimit = this.highlimit;
         const unitstr = this.unitstr;
-        const roundUnits = this.roundUnits
         
         Object.keys(attributes).forEach(function (key) {
             const date_milli = Date.parse(key);
@@ -105,7 +104,7 @@ class AgileRatesCard extends HTMLElement {
             if(attributes[key] > highlimit) colour = "red";
             else if(attributes[key] > mediumlimit) colour = "orange";
             else if(attributes[key] <= 0 ) colour = "blue";
-            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key].toFixed(roundUnits) + unitstr + "</td></tr>");
+            table = table.concat("<tr class='rate_row'><td class='time time_"+colour+"'>" + time_locale + "</td><td class='rate "+colour+"'>" + attributes[key].toFixed(2) + unitstr + "</td></tr>");
             if (x % rows_per_col == 0) {
                 tables = tables.concat(table);
                 table = "";
@@ -160,6 +159,13 @@ class AgileRatesCard extends HTMLElement {
             this.cols = config.cols;
         }
 
+        if (!config.title) {
+            this.title = 'Agile Rates';
+        }
+        else {
+            this.title = config.title;
+        }
+
         if (!config.mediumlimit) {
             this.mediumlimit = 10;
         }
@@ -172,13 +178,6 @@ class AgileRatesCard extends HTMLElement {
         }
         else {
             this.highlimit = config.highlimit;
-        }
-
-        if (!config.roundUnits) {
-            this.roundUnits = 2;
-        }
-        else {
-            this.roundUnits = config.roundUnits;
         }
 
         if(!config.showunits) {
