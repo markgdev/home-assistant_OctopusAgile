@@ -2,7 +2,7 @@ class AgileRatesCard extends HTMLElement {
     set hass(hass) {
         if (!this.content) {
             const card = document.createElement('ha-card');
-            card.header = 'Agile Rates';
+            card.header = this.title;
             this.content = document.createElement('div');
             this.content.style.padding = '0 16px 16px';
 
@@ -158,6 +158,13 @@ class AgileRatesCard extends HTMLElement {
         }
         else {
             this.cols = config.cols;
+        }
+
+        if (!config.title) {
+            this.title = 'Agile Rates';
+        }
+        else {
+            this.title = config.title;
         }
 
         if (!config.mediumlimit) {
