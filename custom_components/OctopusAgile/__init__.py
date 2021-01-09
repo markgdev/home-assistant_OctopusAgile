@@ -37,7 +37,7 @@ import json
 
 DOMAIN = "octopusagile"
 _LOGGER = logging.getLogger(__name__)
-_LOGGER.warning("Starting")
+_LOGGER.debug("Starting")
 datatorefile = ""
 
 def round_time(t):
@@ -67,9 +67,10 @@ def setup(hass, config):
     try:
         with open(datatorefile) as f:
             data = json.load(f)
-            hass.states.set(f"octopusagile.timers", "", {"timers": data["timers"]})
-            hass.states.set(f"octopusagile.rates", "", data["rates"])
-            for entity_id, vals in data["device_times"].items():
+            hass.states.set(f"octopusagile.timers", "", {"timers": data.get("timers")})
+            hass.states.set(f"octopusagile.rates", "", data.get("rates"))
+            device_times = data.get("device_times", {})
+            for entity_id, vals in device_times.items():
                 hass.states.set(f"octopusagile.{entity_id}", vals["start_time"], vals["attribs"])
             f.close()
     except IOError:
@@ -202,12 +203,11 @@ def setup(hass, config):
             entity_id = timer["entity_id"]
             times = timer["times"]
             if rounded_time_str in times.keys():
-                _LOGGER.warning(f"It's time to turn {entity_id} on!")
+                _LOGGER.debug(f"It's time to turn {entity_id} on!")
                 if entity_id.startswith("climate"):
                     if times[rounded_time_str]["params"] is not None:
                         params = times[rounded_time_str]["params"]
                         temp = params["temp"]
-                        _LOGGER.warning(temp)
                         hass.services.call("climate", "set_temperature", {'entity_id': entity_id, "temperature": temp})
                     else:
                         _LOGGER.error(f"{entity_id} does not have any params set, don't know what to do")
