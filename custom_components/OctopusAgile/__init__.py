@@ -183,8 +183,7 @@ def setup(hass, config):
             date_from = datetime.strftime(rounded_time, '%Y-%m-%dT%H:%M:%SZ')
             date_to = datetime.strftime((rounded_time + timedelta(days=1)), f"%Y-%m-%dT{run_before}Z")
             rates = myrates.get_rates(date_from, date_to)["date_rates"]
-            energy_slots = int(energy_time*2)
-            best_time = myrates.get_min_time_run(energy_slots, rates)
+            best_time = myrates.get_min_time_run(energy_time, rates)
             start_time = next(iter(best_time))
             start_time_obj = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
             rate = round(best_time[start_time], 2)
