@@ -79,7 +79,7 @@ def setup(hass, config):
     def handle_update_timers(call):
         """Handle the service call."""
         timer_list = []
-        timers = config["octopusagile"]["timers"]
+        timers = config["octopusagile"].get("timers", [])
         for timer in timers:
             entity_id = timer["entity_id"]
             numHrs = timer["numHrs"]
@@ -136,7 +136,7 @@ def setup(hass, config):
 
         # Add any free slots to the timer for each moneymaker device
         new_rates = myrates.get_new_rates()["date_rates"]
-        moneymakers = config["octopusagile"]["moneymakers"]
+        moneymakers = config["octopusagile"].get("moneymakers", [])
         free_rates = myrates.get_times_below(new_rates, 0)
         for moneymaker_dict in moneymakers:
             moneymaker = next(iter(moneymaker_dict.items()))
@@ -172,7 +172,7 @@ def setup(hass, config):
         hass.states.set("octopusagile.rates", "", new_rates)
 
         # Get next best time to run devices
-        devices = config["octopusagile"]["run_devices"]
+        devices = config["octopusagile"].get("run_devices", [])
         device_times = {}
         for device in devices:
             run_before = device["run_before"]

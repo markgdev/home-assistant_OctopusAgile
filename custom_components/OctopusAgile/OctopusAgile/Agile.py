@@ -157,7 +157,7 @@ class Agile:
         for index, obj in enumerate(keys):
             this_avg = []
             for offset in range(0,slots):
-                if index+offset < len(keys):
+                if index+offset+1 < len(keys):
                     this_avg.append(d[keys[index+offset]])
                 else:
                     min_key = min(avgs, key=avgs.get)
