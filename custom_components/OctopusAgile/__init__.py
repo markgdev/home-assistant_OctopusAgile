@@ -156,7 +156,6 @@ def setup(hass, config):
                     # timer_list.append({"entity_id": entity_id, "times":sorted_mins})
                 else:
                     rates = myrates.get_rates(parsed_date_from, parsed_date_to)["date_rates"]
-                    _LOGGER.info(rates)
                     min_rates = myrates.get_min_time_run(numHrs, rates)
                     start_time = next(iter(min_rates))
                     for entry in min_rates[start_time]["times"]:
@@ -196,6 +195,26 @@ def setup(hass, config):
         f = open(datatorefile,"w")
         f.write(jsonstr)
         f.close()
+
+        # Calc averages for the next day
+        # Including peak
+        date_from = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT23:00:00Z')
+        date_to = datetime.strftime((datetime.utcnow() + timedelta(days=1)), f"%Y-%m-%dT23:00:00Z")
+        rates_exc_peak = myrates.get_rates(date_from, date_to)["date_rates"]
+        avg_rate_inc_peak = round(sum(rates_exc_peak.values())/len(rates_exc_peak.values()), 2)
+        hass.states.set(f"octopusagile.avg_rate_inc_peak", avg_rate_inc_peak)
+
+        # Excluding peak
+        date_from = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT23:00:00Z')
+        date_to = datetime.strftime((datetime.utcnow() + timedelta(days=1)), f"%Y-%m-%dT15:30:00Z")
+        rates_exc_peak = myrates.get_rates(date_from, date_to)["date_rates"]
+
+        date_from = datetime.strftime((datetime.utcnow() + timedelta(days=1)), '%Y-%m-%dT19:00:00Z')
+        date_to = datetime.strftime((datetime.utcnow() + timedelta(days=1)), f"%Y-%m-%dT23:00:00Z")
+        rates_exc_peak.update(myrates.get_rates(date_from, date_to)["date_rates"])
+
+        avg_rate_exc_peak = round(sum(rates_exc_peak.values())/len(rates_exc_peak.values()), 2)
+        hass.states.set(f"octopusagile.avg_rate_exc_peak", avg_rate_exc_peak)
 
     def handle_half_hour_timer(call):
         """Handle the service call."""
