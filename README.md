@@ -105,6 +105,12 @@ sensor:
 ### octopusagile.rates
 All future rates stored in entity attributes
 
+### octopusagile.avg_rate_exc_peak
+The average rate from the day update_timers runs at 23:00 to 22:30 the next day, excluding the 16:00 to 18:30 time periods where the peak rate is applied.
+
+### octopusagile.avg_rate_inc_peak
+The average rate from the day update_timers runs at 23:00 to 22:30 the next day, including the peak.
+
 ### octopusagile.timers
 All timers as created by the timer configuration listed in entity attribute
 
