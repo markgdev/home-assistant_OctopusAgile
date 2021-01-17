@@ -140,19 +140,31 @@ def setup(hass, config):
             else:
                 total_time = 0
                 entity_min_rates = {}
-                for requirement in parsed_requirements:
-                    rates = myrates.get_rates(requirement["time_from"], requirement["time_to"])["date_rates"]
-                    min_rates = myrates.get_min_time_run(requirement["numHrs"], rates)
+                if parsed_requirements:
+                    for requirement in parsed_requirements:
+                        rates = myrates.get_rates(requirement["time_from"], requirement["time_to"])["date_rates"]
+                        min_rates = myrates.get_min_time_run(requirement["numHrs"], rates)
+                        start_time = next(iter(min_rates))
+                        for entry in min_rates[start_time]["times"]:
+                            for time, rate in entry.items():
+                                entity_min_rates[time] = {"params": params, "rate": rate}
+                                total_time += 0.5
+                    sorted_mins = dict(OrderedDict(sorted(entity_min_rates.items())))
+                    timer_list.append({"entity_id": entity_id, "times":sorted_mins})
+                    if numHrs != total_time:
+                        _LOGGER.warning(f"Timer block total requirements time != numHrs, only allocating time blocks specified in requirements of total {total_time}")
+                    # timer_list.append({"entity_id": entity_id, "times":sorted_mins})
+                else:
+                    rates = myrates.get_rates(parsed_date_from, parsed_date_to)["date_rates"]
+                    _LOGGER.info(rates)
+                    min_rates = myrates.get_min_time_run(numHrs, rates)
                     start_time = next(iter(min_rates))
                     for entry in min_rates[start_time]["times"]:
                         for time, rate in entry.items():
                             entity_min_rates[time] = {"params": params, "rate": rate}
                             total_time += 0.5
-                sorted_mins = dict(OrderedDict(sorted(entity_min_rates.items())))
-                timer_list.append({"entity_id": entity_id, "times":sorted_mins})
-                if numHrs != total_time:
-                    _LOGGER.warning(f"Timer block total requirements time != numHrs, only allocating time blocks specified in requirements of total {total_time}")
-                # timer_list.append({"entity_id": entity_id, "times":sorted_mins})
+                    sorted_mins = dict(OrderedDict(sorted(entity_min_rates.items())))
+                    timer_list.append({"entity_id": entity_id, "times":sorted_mins})
 
         # Add any free slots to the timer for each moneymaker device
         new_rates = myrates.get_new_rates()["date_rates"]
