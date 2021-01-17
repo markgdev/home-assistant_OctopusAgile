@@ -154,15 +154,19 @@ class Agile:
         d.update(collections.OrderedDict(reversed(list(in_d.items()))))  # Dict was in wrong order
         keys = list(d.keys())
         avgs = {}
+        avg_times = {}
         for index, obj in enumerate(keys):
             this_avg = []
+            this_avg_times = []
             for offset in range(0,slots):
                 if index+offset+1 < len(keys):
                     this_avg.append(d[keys[index+offset]])
+                    this_avg_times.append({keys[index+offset]: d[keys[index+offset]]})
                 else:
                     min_key = min(avgs, key=avgs.get)
-                    return {min_key: avgs[min_key]}
+                    return {min_key: {"rate": avgs[min_key], "times": avg_times[min_key]}}
             avgs[keys[index]] = sum(this_avg)/slots
+            avg_times[keys[index]] = this_avg_times
 
 
     def get_rates_delta(self, day_delta):
