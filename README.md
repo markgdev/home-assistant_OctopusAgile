@@ -63,7 +63,7 @@ octopusagile:
     entity_id: switch.water_heater
     numHrs: 5
     params: null
-    block: true/false (Optional, note that the blocks will be taken from the requirements, not the total, empty requirements will result in no timer.)
+    block: true/false (Optional, not that if requirements are set, the block times will be taken from there.)
     requirements:
       - day_from: today
         day_to: tomorrow
