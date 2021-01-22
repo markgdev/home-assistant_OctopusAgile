@@ -5,15 +5,18 @@ Octopus Agile custom component for Home Assistant
 Feel free to use my referral code and get £50 credit to your account (as well as mine): https://share.octopus.energy/lilac-bison-793
 
 ## Installation
-Clone this repo
-
-Copy custom_components/OctopusAgile to <homeassistant config>/custom_components/OctopusAgile
+Clone this repo and copy custom_components/OctopusAgile to <homeassistant config>/custom_components/OctopusAgile
+  
+Alternatively, install via [HACS](https://hacs.xyz/)
 
 ## Configuration
-Example configuration.yaml config as below.
+See the example configuration.yaml config below
 
 ### region_code
-This should match the region code as per the Octopus Agile API
+This should match the [DNO region code](https://www.energy-stats.uk/dno-region-codes-explained/) as per the Octopus Agile API - look for "E-1R-AGILE-18-02-21-" on your [API dashboard](https://octopus.energy/dashboard/developer/) and the next letter is your region code.
+
+### mpan, serial, and auth
+Your MPAN and serial number are listed on your [API dashboard page](https://octopus.energy/dashboard/developer/). "*auth*" is your API key from the same page.
 
 ### moneymakers
 The concept of moneymakers is devices that should always turn on if the price drops to 0 or below. 
