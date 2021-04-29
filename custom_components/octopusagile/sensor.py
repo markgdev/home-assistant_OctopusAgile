@@ -82,8 +82,16 @@ class PreviousRate(Entity):
         # attributes['sn'] = 'some other data'
         # # attributes['date_to']
         # self._attributes = attributes
-        rate = round(self.myrates.get_previous_rate(), 2)
-        self._state = rate
+        nowtime = self.myrates.round_time(dt_util.utcnow())
+        prevtime = nowtime - timedelta(minutes=30)
+        rounded_time_str = prevtime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        prev_rate = self.hass.states.get("octopusagile.all_rates").attributes.get(rounded_time_str)
+        if prev_rate == None:
+            _LOGGER.error("Error updating sensor.octopus_agile_previous_rate, check that octopusagile.all_rates populated")
+            self._state = "Unknown"
+        else:
+            prev_rate = round(prev_rate, 2)
+            self._state = prev_rate
 
 class CurrentRate(Entity):
     """Representation of a Sensor."""
@@ -146,8 +154,11 @@ class CurrentRate(Entity):
         # attributes['sn'] = 'some other data'
         # # attributes['date_to']
         # self._attributes = attributes
-        rate = round(self.myrates.get_current_rate(), 2)
-        self._state = rate
+        nowtime = self.myrates.round_time(dt_util.utcnow())
+        rounded_time_str = nowtime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        current_rate = self.hass.states.get("octopusagile.all_rates").attributes.get(rounded_time_str)
+        current_rate = round(current_rate, 2)
+        self._state = current_rate
 
 class NextRate(Entity):
     """Representation of a Sensor."""
@@ -210,8 +221,12 @@ class NextRate(Entity):
         # attributes['sn'] = 'some other data'
         # # attributes['date_to']
         # self._attributes = attributes
-        rate = round(self.myrates.get_next_rate(), 2)
-        self._state = rate
+        nowtime = self.myrates.round_time(dt_util.utcnow())
+        nexttime = nowtime + timedelta(minutes=30)
+        rounded_time_str = nexttime.strftime("%Y-%m-%dT%H:%M:%SZ")
+        next_rate = self.hass.states.get("octopusagile.all_rates").attributes.get(rounded_time_str)
+        next_rate = round(next_rate, 2)
+        self._state = next_rate
 
 class MinRate(Entity):
     """Representation of a Sensor."""
