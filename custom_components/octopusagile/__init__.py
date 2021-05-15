@@ -68,7 +68,14 @@ def setup(hass, config):
         with open(datatorefile) as f:
             data = json.load(f)
             hass.states.set(f"octopusagile.timers", "", {"timers": data.get("timers")})
-            hass.states.set(f"octopusagile.rates", "", data.get("rates"))
+            rates = data.get("rates")
+            if rates == None:
+                rates = myrates.get_new_rates()["date_rates"]
+            hass.states.set(f"octopusagile.rates", "", rates)
+            all_rates = data.get("all_rates")
+            if all_rates is None:
+                all_rates = myrates.get_new_rates()["date_rates"]
+            hass.states.set(f"octopusagile.all_rates", "", all_rates)
             device_times = data.get("device_times", {})
             for entity_id, vals in device_times.items():
                 hass.states.set(f"octopusagile.{entity_id}", vals["start_time"], vals["attribs"])
@@ -78,6 +85,12 @@ def setup(hass, config):
 
     def handle_update_timers(call):
         """Handle the service call."""
+        # Save a copy of the days rates that will 
+        # not get updated every 30 mins
+        # This will be used to keep sensors updated.
+        new_rates = myrates.get_new_rates()["date_rates"]
+        hass.states.set("octopusagile.all_rates", "", new_rates)
+
         timer_list = []
         timers = config["octopusagile"].get("timers", [])
         for timer in timers:
@@ -166,7 +179,7 @@ def setup(hass, config):
                     timer_list.append({"entity_id": entity_id, "times":sorted_mins})
 
         # Add any free slots to the timer for each moneymaker device
-        new_rates = myrates.get_new_rates()["date_rates"]
+        
         moneymakers = config["octopusagile"].get("moneymakers", [])
         free_rates = myrates.get_times_below(new_rates, 0)
         for moneymaker_dict in moneymakers:
@@ -191,7 +204,7 @@ def setup(hass, config):
 
         hass.states.set(f"octopusagile.timers", "", {"timers":timer_list})
         
-        jsonstr = json.dumps({"timers":timer_list, "rates":new_rates})
+        jsonstr = json.dumps({"timers":timer_list, "rates":new_rates, "all_rates": new_rates})
         f = open(datatorefile,"w")
         f.write(jsonstr)
         f.close()
@@ -226,23 +239,26 @@ def setup(hass, config):
         devices = config["octopusagile"].get("run_devices", [])
         device_times = {}
         for device in devices:
-            run_before = device["run_before"]
-            energy_time = device["energy_time"]
-            run_time = device["run_time"]
-            entity_id = device["entity_id"]
-            rounded_time = round_time(datetime.utcnow())
-            date_from = datetime.strftime(rounded_time, '%Y-%m-%dT%H:%M:%SZ')
-            date_to = datetime.strftime((rounded_time + timedelta(days=1)), f"%Y-%m-%dT{run_before}Z")
-            rates = myrates.get_rates(date_from, date_to)["date_rates"]
-            best_time = myrates.get_min_time_run(energy_time, rates)
-            start_time = next(iter(best_time))
-            start_time_obj = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
-            rate = round(best_time[start_time]["rate"], 2)
-            start_in = (start_time_obj - rounded_time).total_seconds()/3600
-            end_in = start_in + run_time
-            attribs = {"start_time": start_time, "start_in": start_in, "end_in": end_in, "rate": rate}
-            hass.states.set(f"octopusagile.{entity_id}", start_time, attribs)
-            device_times[entity_id] = {"start_time": start_time, "attribs": attribs}
+            try:
+                run_before = device["run_before"]
+                energy_time = device["energy_time"]
+                run_time = device["run_time"]
+                entity_id = device["entity_id"]
+                rounded_time = round_time(datetime.utcnow())
+                date_from = datetime.strftime(rounded_time, '%Y-%m-%dT%H:%M:%SZ')
+                date_to = datetime.strftime((rounded_time + timedelta(days=1)), f"%Y-%m-%dT{run_before}Z")
+                rates = myrates.get_rates(date_from, date_to)["date_rates"]
+                best_time = myrates.get_min_time_run(energy_time, rates)
+                start_time = next(iter(best_time))
+                start_time_obj = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
+                rate = round(best_time[start_time]["rate"], 2)
+                start_in = (start_time_obj - rounded_time).total_seconds()/3600
+                end_in = start_in + run_time
+                attribs = {"start_time": start_time, "start_in": start_in, "end_in": end_in, "rate": rate}
+                hass.states.set(f"octopusagile.{entity_id}", start_time, attribs)
+                device_times[entity_id] = {"start_time": start_time, "attribs": attribs}
+            except:
+                _LOGGER.error(f"Failed to update run_devices for {entity_id}")
 
         timers = hass.states.get("octopusagile.timers").attributes["timers"]
 
@@ -401,7 +417,9 @@ def setup(hass, config):
     hass.services.register(DOMAIN, "update_consumption", handle_update_consumption)
     update_timers(dt_util.utcnow())
     half_hour_timer(dt_util.utcnow())
-    update_consumption(dt_util.utcnow())
+    if config["octopusagile"].get("consumption", True) == True:
+        _LOGGER.info("Enabling population of consumption stats")
+        update_consumption(dt_util.utcnow())
     first_run = False
 
     # Return boolean to indicate that initialization was successfully.
