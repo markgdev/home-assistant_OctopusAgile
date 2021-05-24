@@ -335,6 +335,38 @@ class Agile:
         consumption = requests.get(url=consumption_url_str, auth=(self.auth, ''))
         return consumption.json()
 
+    def aggregate_consumption(self):
+        week_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+        end = datetime.now().date()
+        start = end - timedelta(days=30)
+
+        data = self.get_consumption(start, end)
+        hourly = {}
+        daily = {}
+        hour_daily = {}
+
+        for record in data['results']:
+            start = dateutil.parser.parse(record['interval_start'])
+            if start.minute not in [0, 30]: continue
+
+            if f"{start.hour}:{start.minute:02}" not in hourly:
+                hourly[f"{start.hour}:{start.minute:02}"] = []
+            hourly[f"{start.hour}:{start.minute:02}"].append(record['consumption'])
+
+            if week_days[start.weekday()] not in daily:
+                daily[week_days[start.weekday()]] = []
+            daily[week_days[start.weekday()]].append(record['consumption'] * 48)
+
+            if f"{week_days[start.weekday()]} {start.hour}:{start.minute:02}" not in hour_daily:
+                hour_daily[f"{week_days[start.weekday()]} {start.hour}:{start.minute:02}"] = []
+            hour_daily[f"{week_days[start.weekday()]} {start.hour}:{start.minute:02}"].append(record['consumption'])
+
+        for d in [hourly, daily, hour_daily]:
+            for key, value in d.items():
+                d[key]=round(sum(value) / len(value), 3)
+        return hourly, daily, hour_daily
+
     def calculcate_cost(self, start, end):
         jconsumption = self.get_consumption(start, end)
         jcost = self.get_raw_rates_json(f"{start.isoformat()}T00:00:00Z", f"{end.isoformat()}T23:59:59Z")

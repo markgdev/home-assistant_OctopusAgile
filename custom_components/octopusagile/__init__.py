@@ -357,6 +357,10 @@ def setup(hass, config):
                            round(monthlycost/100, 2),
                            attributes={'unit_of_measurement': '£',
                                        'icon': 'mdi:cash'})
+        hourly, daily, hour_daily = myrates.aggregate_consumption()
+        hass.states.set(f"octopusagile.hourly_consumption", "", hourly)
+        hass.states.set(f"octopusagile.daily_consumption", "", daily)
+        hass.states.set(f"octopusagile.hour_daily_consumption", "", hour_daily)
 
     def half_hour_timer(nowtime):
         roundedtime = myrates.round_time(nowtime)
