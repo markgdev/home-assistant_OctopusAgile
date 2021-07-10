@@ -58,7 +58,10 @@ def setup(hass, config):
         auth = config["octopusagile"]["auth"]
         mpan = config["octopusagile"]["mpan"]
         serial = config["octopusagile"]["serial"]
-        myrates = Agile(area_code=region_code, auth=auth, mpan=mpan, serial=serial)
+        gorate = config["octopusagile"].get("gorate", None)
+        godayrate = config["octopusagile"].get("godayrate", None)
+        gotimes = config["octopusagile"].get("gotimes", [])
+        myrates = Agile(area_code=region_code, auth=auth, mpan=mpan, serial=serial, gorate=gorate, godayrate=godayrate, gotimes=gotimes)
         hass.states.set(f"octopusagile.region_code", region_code)
         startdate = config["octopusagile"]["startdate"]
         hass.states.set(f"octopusagile.startdate", startdate)
@@ -79,12 +82,6 @@ def setup(hass, config):
             device_times = data.get("device_times", {})
             for entity_id, vals in device_times.items():
                 hass.states.set(f"octopusagile.{entity_id}", vals["start_time"], vals["attribs"])
-            avg_rate_inc_peak = data.get("avg_rate_inc_peak")
-            if avg_rate_inc_peak is not None:
-                hass.states.set(f"octopusagile.avg_rate_inc_peak", avg_rate_inc_peak, {"unit_of_measurement": "p/kWh"})
-            avg_rate_exc_peak = data.get("avg_rate_exc_peak")
-            if avg_rate_exc_peak is not None:
-                hass.states.set(f"octopusagile.avg_rate_exc_peak", avg_rate_exc_peak, {"unit_of_measurement": "p/kWh"})
             f.close()
     except IOError:
         print(f"{datatorefile} does not exist")
@@ -210,15 +207,19 @@ def setup(hass, config):
 
         hass.states.set(f"octopusagile.timers", "", {"timers":timer_list})
         
-        
+        jsonstr = json.dumps({"timers":timer_list, "rates":new_rates, "all_rates": new_rates})
+        f = open(datatorefile,"w")
+        f.write(jsonstr)
+        f.close()
 
         # Calc averages for the next day
         # Including peak
         date_from = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT23:00:00Z')
         date_to = datetime.strftime((datetime.utcnow() + timedelta(days=1)), f"%Y-%m-%dT23:00:00Z")
         rates_exc_peak = myrates.get_rates(date_from, date_to)["date_rates"]
-        avg_rate_inc_peak = round(sum(rates_exc_peak.values())/len(rates_exc_peak.values()), 2)
-        hass.states.set(f"octopusagile.avg_rate_inc_peak", avg_rate_inc_peak, {"unit_of_measurement": "p/kWh"})
+        if len(rates_exc_peak.values()) > 0:
+            avg_rate_inc_peak = round(sum(rates_exc_peak.values())/len(rates_exc_peak.values()), 2)
+            hass.states.set(f"octopusagile.avg_rate_inc_peak", avg_rate_inc_peak)
 
         # Excluding peak
         date_from = datetime.strftime(datetime.utcnow(), '%Y-%m-%dT23:00:00Z')
@@ -229,19 +230,9 @@ def setup(hass, config):
         date_to = datetime.strftime((datetime.utcnow() + timedelta(days=1)), f"%Y-%m-%dT23:00:00Z")
         rates_exc_peak.update(myrates.get_rates(date_from, date_to)["date_rates"])
 
-        avg_rate_exc_peak = round(sum(rates_exc_peak.values())/len(rates_exc_peak.values()), 2)
-        hass.states.set(f"octopusagile.avg_rate_exc_peak", avg_rate_exc_peak, {"unit_of_measurement": "p/kWh"})
-
-        jsonstr = json.dumps({
-            "timers":timer_list, 
-            "rates":new_rates, 
-            "all_rates": new_rates, 
-            "avg_rate_exc_peak": avg_rate_exc_peak, 
-            "avg_rate_inc_peak": avg_rate_inc_peak
-        })
-        f = open(datatorefile,"w")
-        f.write(jsonstr)
-        f.close()
+        if len(rates_exc_peak.values()) > 0:
+            avg_rate_exc_peak = round(sum(rates_exc_peak.values())/len(rates_exc_peak.values()), 2)
+            hass.states.set(f"octopusagile.avg_rate_exc_peak", avg_rate_exc_peak)
 
     def handle_half_hour_timer(call):
         """Handle the service call."""
@@ -371,10 +362,6 @@ def setup(hass, config):
                            round(monthlycost/100, 2),
                            attributes={'unit_of_measurement': '£',
                                        'icon': 'mdi:cash'})
-        hourly, daily, hour_daily = myrates.aggregate_consumption()
-        hass.states.set(f"octopusagile.hourly_consumption", "", hourly)
-        hass.states.set(f"octopusagile.daily_consumption", "", daily)
-        hass.states.set(f"octopusagile.hour_daily_consumption", "", hour_daily)
 
     def half_hour_timer(nowtime):
         roundedtime = myrates.round_time(nowtime)
