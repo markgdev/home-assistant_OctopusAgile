@@ -24,7 +24,7 @@ class Agile:
             minute = 30
         return (t.replace(second=0, microsecond=0, minute=minute, hour=t.hour))
 
-    def __init__(self, area_code=None, auth=None, mpan=None, serial=None, gas=None):
+    def __init__(self, area_code=None, auth=None, mpan=None, serial=None, gas=None, gorate=None, godayrate=None, gotimes=[]):
         self.base_url = 'https://api.octopus.energy/v1'
         self.meter_points_url = f'{self.base_url}/electricity-meter-points/'
         self.cost_url = f'{self.base_url}/products/AGILE-18-02-21/electricity-tariffs'
@@ -32,6 +32,10 @@ class Agile:
         self.auth = auth
         self.MPAN = mpan
         self.SERIAL = serial
+
+        self.gorate = gorate
+        self.godayrate = godayrate
+        self.gotimes = gotimes
 
         if area_code is None:
             self.area_code = self.find_region(self.MPAN)
@@ -193,6 +197,17 @@ class Agile:
                          f'standard-unit-rates/{ date_from }{ date_to }', headers=headers)
         # print(r)
         results = r.json()
+        # go_times = ["17:00:00", "17:30:00"]
+        if self.gorate is not None:
+            for result in results["results"]:
+                is_go_time = any(gotime in result["valid_from"] for gotime in self.gotimes)
+                if is_go_time:
+                    result["value_inc_vat"] = round(self.gorate, 2)
+                    result["value_exc_vat"] = round(self.gorate/1.05,2)
+                elif self.godayrate is not None:
+                    result["value_inc_vat"] = round(self.godayrate, 2)
+                    result["value_exc_vat"] = round(self.godayrate/1.05,2)
+
         _LOGGER.debug(r.url)
         return results
 
@@ -334,38 +349,6 @@ class Agile:
         
         consumption = requests.get(url=consumption_url_str, auth=(self.auth, ''))
         return consumption.json()
-
-    def aggregate_consumption(self):
-        week_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-
-        end = datetime.now().date()
-        start = end - timedelta(days=30)
-
-        data = self.get_consumption(start, end)
-        hourly = {}
-        daily = {}
-        hour_daily = {}
-
-        for record in data['results']:
-            start = dateutil.parser.parse(record['interval_start'])
-            if start.minute not in [0, 30]: continue
-
-            if f"{start.hour}:{start.minute:02}" not in hourly:
-                hourly[f"{start.hour}:{start.minute:02}"] = []
-            hourly[f"{start.hour}:{start.minute:02}"].append(record['consumption'])
-
-            if week_days[start.weekday()] not in daily:
-                daily[week_days[start.weekday()]] = []
-            daily[week_days[start.weekday()]].append(record['consumption'] * 48)
-
-            if f"{week_days[start.weekday()]} {start.hour}:{start.minute:02}" not in hour_daily:
-                hour_daily[f"{week_days[start.weekday()]} {start.hour}:{start.minute:02}"] = []
-            hour_daily[f"{week_days[start.weekday()]} {start.hour}:{start.minute:02}"].append(record['consumption'])
-
-        for d in [hourly, daily, hour_daily]:
-            for key, value in d.items():
-                d[key]=round(sum(value) / len(value), 3)
-        return hourly, daily, hour_daily
 
     def calculcate_cost(self, start, end):
         jconsumption = self.get_consumption(start, end)

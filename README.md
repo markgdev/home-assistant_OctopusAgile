@@ -59,6 +59,22 @@ octopusagile:
   serial: 00000000
   auth: abc00000000
   startdate: "2020-05-08"
+  # Easily switch between agile and go rates.
+  # If you include gorate, it'll override
+  # the times for the times specified in gotimes
+  gorate: 5
+  # You can leave godayrate out to go by 
+  # Agile rates outside of offpeak period
+  godayrate: 16.26
+  gotimes:
+  - "23:30:00"
+  - "00:00:00"
+  - "00:30:00"
+  - "01:00:00"
+  - "01:30:00"
+  - "02:00:00"
+  - "02:30:00"
+  - "03:00:00"
   moneymakers:
   - switch.water_heater: null
   - climate.downstairs: 
