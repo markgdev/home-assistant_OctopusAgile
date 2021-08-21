@@ -10,7 +10,7 @@ or
 
 ## Installation
 Clone this repo and copy custom_components/OctopusAgile to <homeassistant config>/custom_components/OctopusAgile
-  
+
 Alternatively, install via [HACS](https://hacs.xyz/)
 
 ## Configuration
@@ -25,8 +25,8 @@ This should match the [DNO region code](https://www.energy-stats.uk/dno-region-c
 Your MPAN and serial number are listed on your [API dashboard page](https://octopus.energy/dashboard/developer/). "*auth*" is your API key from the same page.
 
 ### moneymakers
-The concept of moneymakers is devices that should always turn on if the price drops to 0 or below. 
-This can either be a switch or climate device. Note that I have only tested this with my tado thermostat. 
+The concept of moneymakers is devices that should always turn on if the price drops to 0 or below.
+This can either be a switch or climate device. Note that I have only tested this with my tado thermostat.
 Populate params as per the example for climate.
 
 Moneymakers are added to the octopusagile.timers entity which is then checked at the beginning of each half hour to decide if the device should be on or off.
@@ -38,10 +38,10 @@ day_from/day_to can be either "today" or "tomorrow", this is in reference to whe
 
 Moneymakers are added to the octopusagile.timers entity which is then checked at the beginning of each half hour to decide if the device should be on or off.
 
-The concept of requirements is best explained with an example. My water heater should turn on for 5 hours each day, 
+The concept of requirements is best explained with an example. My water heater should turn on for 5 hours each day,
 however it should run for at least and hour between 1900 and 0600 and at least an hour between 1000 and 1600 to ensure that we always have hot water.
 
-Hopefully the other options are self explanatory. 
+Hopefully the other options are self explanatory.
 
 ### run_devices
 This creates a entity detailing the best time period to run a device that needs x number of hours to run.
@@ -65,7 +65,7 @@ octopusagile:
   # If you include gorate, it'll override
   # the times for the times specified in gotimes
   gorate: 5
-  # You can leave godayrate out to go by 
+  # You can leave godayrate out to go by
   # Agile rates outside of offpeak period
   godayrate: 16.26
   gotimes:
@@ -79,7 +79,7 @@ octopusagile:
   - "03:00:00"
   moneymakers:
   - switch.water_heater: null
-  - climate.downstairs: 
+  - climate.downstairs:
       params:
         temp: 25
   timers:
@@ -145,7 +145,7 @@ Region code as set in configuration
 ### octopusagile.half_hour_timer_nextupdate
 When the half hour timer will next run
 
-### octopusagile.half_hour_timer_lastupdate	
+### octopusagile.half_hour_timer_lastupdate
 When the half hour timer last run
 
 ### octopusagile.update_timers_nextupdate
@@ -171,3 +171,10 @@ Note that i am using an owl energy monitor for the energy usage stats. I will lo
 ### Rates card
 [See here](https://github.com/markgdev/home-assistant_OctopusAgile/tree/master/custom_cards)
 ![Image of Card](https://raw.githubusercontent.com/markgdev/home-assistant_OctopusAgile/master/custom_cards/agile-rates-card-screenshot.png)
+
+## Development
+
+This repo uses `pipenv` to manage Python versions and dependencies. To get up and running:
+
+* Install [pipenv](https://pipenv.pypa.io/en/latest/install/#installing-pipenv) if you don't already have it.
+* Run `pipenv install` to install any required packages and create the right python environment.
