@@ -14,6 +14,8 @@ Clone this repo and copy custom_components/OctopusAgile to <homeassistant config
 Alternatively, install via [HACS](https://hacs.xyz/)
 
 ## Configuration
+NOTE: the GUI configuration flow is currently not implemented.
+
 See the example configuration.yaml config below
 
 ### region_code
