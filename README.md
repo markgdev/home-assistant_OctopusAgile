@@ -106,6 +106,7 @@ octopusagile:
   run_devices:
   - energy_time: 2.5
     entity_id: dishwasher
+    run_after: '06:00:00' # This is optional
     run_before: '08:00:00'
     run_time: 3.5
   - energy_time: 2.5
