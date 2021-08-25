@@ -291,7 +291,7 @@ def setup(hass, config):
                     start_in = (start_time_obj - rounded_time).total_seconds()/3600
                     end_in = start_in + run_time
                     attribs = {"start_time": start_time, "start_in": start_in, "end_in": end_in, "rate": rate, "device_class": "timestamp"}
-                    hass.states.set(f"octopusagile.{entity_id}", start_time, attribs)
+                    hass.states.set(f"sensor.octopusagile_{entity_id}", dt_util.as_utc(start_time_obj), attribs)
                     device_times[entity_id] = {"start_time": start_time_obj, "attribs": attribs}
             except:
                 _LOGGER.error(f"Failed to update run_devices for {entity_id}")
