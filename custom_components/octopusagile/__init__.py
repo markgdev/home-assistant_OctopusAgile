@@ -245,23 +245,54 @@ def setup(hass, config):
         device_times = {}
         for device in devices:
             try:
+                entity_id = device["entity_id"]
+                if "run_after" in device:
+                    run_after = device["run_after"]
+                else:
+                    run_after = None
+
                 run_before = device["run_before"]
                 energy_time = device["energy_time"]
                 run_time = device["run_time"]
-                entity_id = device["entity_id"]
-                rounded_time = round_time(datetime.utcnow())
-                date_from = datetime.strftime(rounded_time, '%Y-%m-%dT%H:%M:%SZ')
-                date_to = datetime.strftime((rounded_time + timedelta(days=1)), f"%Y-%m-%dT{run_before}Z")
+                
+                # Deal with local time so we handle daylight savings
+                rounded_time = datetime.strptime(datetime.strftime(round_time(dt_util.as_local(datetime.utcnow())), '%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%dT%H:%M:%SZ')
+
+                date_to_obj = datetime.strptime(datetime.strftime(rounded_time, f"%Y-%m-%dT{run_before}Z"), '%Y-%m-%dT%H:%M:%SZ')
+
+                # If our target time is in the past, then look towards tomorrow
+                if date_to_obj < rounded_time:
+                    date_to_obj = date_to_obj + timedelta(days=1)
+
+                # If run after is defined then make sure our device rate falls within the specified time
+                if run_after is None:
+                    date_from_obj = rounded_time
+                else:
+                    date_from_obj = datetime.strptime(datetime.strftime(date_to_obj, f"%Y-%m-%dT{run_after}Z"), '%Y-%m-%dT%H:%M:%SZ')
+
+                # If our from date is after our to date, then go back a day
+                if date_from_obj > date_to_obj:
+                    date_from_obj = date_from_obj - timedelta(days=1)
+
+                # Reset our from date to now if our current time is between our two target dates so that we don't get
+                # a date/time in the past
+                if (rounded_time > date_from_obj and rounded_time < date_to_obj):
+                    date_from_obj = rounded_time
+
+                date_from = datetime.strftime(date_from_obj, '%Y-%m-%dT%H:%M:%SZ')
+                date_to = datetime.strftime(date_to_obj, '%Y-%m-%dT%H:%M:%SZ')
+
                 rates = myrates.get_rates(date_from, date_to)["date_rates"]
                 best_time = myrates.get_min_time_run(energy_time, rates)
-                start_time = next(iter(best_time))
-                start_time_obj = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
-                rate = round(best_time[start_time]["rate"], 2)
-                start_in = (start_time_obj - rounded_time).total_seconds()/3600
-                end_in = start_in + run_time
-                attribs = {"start_time": start_time, "start_in": start_in, "end_in": end_in, "rate": rate}
-                hass.states.set(f"octopusagile.{entity_id}", start_time, attribs)
-                device_times[entity_id] = {"start_time": start_time, "attribs": attribs}
+                if best_time is not None:
+                    start_time = next(iter(best_time))
+                    start_time_obj = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%SZ')
+                    rate = round(best_time[start_time]["rate"], 2)
+                    start_in = (start_time_obj - rounded_time).total_seconds()/3600
+                    end_in = start_in + run_time
+                    attribs = {"start_time": start_time, "start_in": start_in, "end_in": end_in, "rate": rate, "device_class": "timestamp"}
+                    hass.states.set(f"octopusagile.{entity_id}", start_time, attribs)
+                    device_times[entity_id] = {"start_time": start_time_obj, "attribs": attribs}
             except:
                 _LOGGER.error(f"Failed to update run_devices for {entity_id}")
 

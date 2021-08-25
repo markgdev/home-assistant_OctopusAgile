@@ -159,6 +159,11 @@ class Agile:
         keys = list(d.keys())
         avgs = {}
         avg_times = {}
+
+        # If we have less rates than required hours, then we've missed our window
+        if (len(keys) < slots):
+            return None
+
         for index, obj in enumerate(keys):
             this_avg = []
             this_avg_times = []
