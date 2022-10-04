@@ -61,7 +61,8 @@ def setup(hass, config):
         gorate = config["octopusagile"].get("gorate", None)
         godayrate = config["octopusagile"].get("godayrate", None)
         gotimes = config["octopusagile"].get("gotimes", [])
-        myrates = Agile(area_code=region_code, auth=auth, mpan=mpan, serial=serial, gorate=gorate, godayrate=godayrate, gotimes=gotimes)
+        agilerate = config["octopusagile"].get("agilerate","AGILE-18-02-21")
+        myrates = Agile(area_code=region_code, auth=auth, mpan=mpan, serial=serial, agilerate=agilerate, gorate=gorate, godayrate=godayrate, gotimes=gotimes)
         hass.states.set(f"octopusagile.region_code", region_code)
         startdate = config["octopusagile"]["startdate"]
         hass.states.set(f"octopusagile.startdate", startdate)

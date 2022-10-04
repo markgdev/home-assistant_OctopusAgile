@@ -11,6 +11,6 @@
   "codeowners": [
     "@markgdev"
   ],
-  "version": "2021.3.0b0",
+  "version": "2022.10.0b0",
   "iot_class": "cloud_polling"
 }
