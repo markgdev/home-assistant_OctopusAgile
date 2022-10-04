@@ -24,6 +24,14 @@ This should match the [DNO region code](https://www.energy-stats.uk/dno-region-c
 ### mpan, serial, and auth
 Your MPAN and serial number are listed on your [API dashboard page](https://octopus.energy/dashboard/developer/). "*auth*" is your API key from the same page.
 
+### agilerate
+As of July 2022 there are now 3 Agile Tariffs :
+  * AGILE-18-02-21 - The unit rate is capped at 35p/kWh (including VAT)
+  * AGILE-22-07-22 - The unit rate is capped at 55p/kWh (including VAT)
+  * AGILE-22-08-31 - The unit rate is capped at 78p/kWh (including VAT)
+
+default if not set is AGILE-18-02-21
+
 ### moneymakers
 The concept of moneymakers is devices that should always turn on if the price drops to 0 or below.
 This can either be a switch or climate device. Note that I have only tested this with my tado thermostat.

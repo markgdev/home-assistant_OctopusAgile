@@ -16,6 +16,7 @@ class Agile:
     MPAN = None
     SERIAL = None
     gas = None
+    agilerate = "AGILE-18-02-21"
 
     def round_time(self, t):
     # Rounds to nearest half hour
@@ -24,10 +25,11 @@ class Agile:
             minute = 30
         return (t.replace(second=0, microsecond=0, minute=minute, hour=t.hour))
 
-    def __init__(self, area_code=None, auth=None, mpan=None, serial=None, gas=None, gorate=None, godayrate=None, gotimes=[]):
+    def __init__(self, area_code=None, auth=None, mpan=None, serial=None, gas=None, agilerate="AGILE-18-02-21", gorate=None, godayrate=None, gotimes=[]):
         self.base_url = 'https://api.octopus.energy/v1'
+        self.agilerate = agilerate
         self.meter_points_url = f'{self.base_url}/electricity-meter-points/'
-        self.cost_url = f'{self.base_url}/products/AGILE-18-02-21/electricity-tariffs'
+        self.cost_url = f'{self.base_url}/products/{self.agilerate}/electricity-tariffs'
 
         self.auth = auth
         self.MPAN = mpan
@@ -58,7 +60,7 @@ class Agile:
             'v1/electricity-meter-points/' + str(self.MPAN) + '/meters/' + \
             str(self.SERIAL) + '/consumption/'
         costurl = 'https://api.octopus.energy/v1/products/' + \
-            'AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-' + \
+            f'{self.agilerate}/electricity-tariffs/E-1R-{self.agilerate}-' + \
             str(area_code).upper() + '/standard-unit-rates/'
 
         # self.area_code = area_code
@@ -193,7 +195,7 @@ class Agile:
             date_to = ""
         headers = {'content-type': 'application/json'}
         r = requests.get(f'{self.cost_url}/'
-                         f'E-1R-AGILE-18-02-21-{self.area_code}/'
+                         f'E-1R-{self.agilerate}-{self.area_code}/'
                          f'standard-unit-rates/{ date_from }{ date_to }', headers=headers)
         # print(r)
         results = r.json()
@@ -219,11 +221,10 @@ class Agile:
         #     date_to = ""
         # headers = {'content-type': 'application/json'}
         # r = requests.get(f'{self.cost_url}/'
-        #                  f'E-1R-AGILE-18-02-21-{self.area_code}/'
+        #                  f'E-1R-{self.agilerate}-{self.area_code}/'
         #                  f'standard-unit-rates/{ date_from }{ date_to }', headers=headers)
         # results = r.json()["results"]
         results = self.get_raw_rates_json(date_from, date_to)["results"]
-        # _LOGGER.debug(r.url)
         return results
 
     def get_new_rates(self):
