@@ -1,10 +1,9 @@
 # home-assistant_OctopusAgile
 Octopus Agile custom component for Home Assistant
 
-## Referral code
-Feel free to use my referral code and get £50 credit to your account (as well as mine): https://share.octopus.energy/lilac-bison-793
-
-or
+## No longer maintained
+This project is no longer maintained, feel free to open pull requests and I will merge them, although I am unable to test.
+If you would like to adopt the project please get jn touch!
 
 <a href="https://www.buymeacoffee.com/markgdev" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
