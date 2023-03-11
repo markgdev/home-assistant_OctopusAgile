@@ -8,7 +8,7 @@
   "dependencies": [],
   "documentation": "https://github.com/markgdev/home-assistant_OctopusAgile",
   "homekit": {},
-  "iot_class": "cloud_polling"
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/markgdev/home-assistant_OctopusAgile/issues",
   "ssdp": [],
   "version": "2022.10.0b0",
