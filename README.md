@@ -162,7 +162,7 @@ When the update timers timer will next run
 When the update timers timer last run
 
 ### octopusagile.<run_device_name>
-A seperate entity for each configured run_device with the time stored in state and start time, start in, end in and average rate stored in the attributes
+A separate entity for each configured run_device with the time stored in state and start time, start in, end in and average rate stored in the attributes
 
 ## Example usage
 ### Dashboard
