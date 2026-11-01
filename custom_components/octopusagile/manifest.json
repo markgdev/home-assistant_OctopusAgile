@@ -10,7 +10,11 @@
   "homekit": {},
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/markgdev/home-assistant_OctopusAgile/issues",
+  "requirements": [
+    "python-dateutil",
+    "pytz"
+  ],
   "ssdp": [],
-  "version": "2022.10.0b0",
+  "version": "2022.10.0b1",
   "zeroconf": []
 }
